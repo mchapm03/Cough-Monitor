@@ -12,28 +12,56 @@
 	<title> Cough Monitor Portal </title>
 </head>
 <body>
+
+	
 	<div class="container-fluid">
 
-
-		<form class="form-signin">
+		<div class="form-signin" id="login-form" >
 	        <h2 class="form-signin-heading">Cough Monitor Portal</h2>
+	        <p id="login-failed"></p>
 	        <label for="inputEmail" class="sr-only">Email address</label>
 	        <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
 	        <label for="inputPassword" class="sr-only">Password</label>
 	        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
-	        <div class="checkbox">
+	        <!--<div class="checkbox">
 	          <label>
 	            <input type="checkbox" value="remember-me"> Remember me
 	          </label>
-	        </div>
-	        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-      	</form>
+	        </div>-->
+	        <button class="btn btn-lg btn-primary btn-block" type="submit" id="signin-but" onclick=login()>Sign in</button>
+          	<p><a href="new-user.html">Make new user </a></p>
+
+      	</div>
+
 	<!--container-->
 	</div>
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <!-- Latest compiled and minified JavaScript -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<script>
+		function login(){
+			var email = document.getElementById("inputEmail").value;
+			var pass = document.getElementById("inputPassword").value;
+			var xhttp = new XMLHttpRequest();
+  			xhttp.onreadystatechange = function() {
+	   		 	if (xhttp.readyState == 4 && xhttp.status == 200) {
+	   		 		response = JSON.parse(xhttp.responseText);
+	   		 		if(response.success == false){
+		      			document.getElementById("login-failed").innerHTML = response.message;
+					} else{
+              			window.location.replace('add-pt.html');
+
+						//redirect
+					}
+			  	}
+			}
+		  xhttp.open("POST", "/php/login.php", true);
+		  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		  xhttp.send("email="+email+"&pass="+pass);
+		}
+
+	</script>
 	
 </body>
 </html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html/>
+<html>
+<head lang="en">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="UTF-8">
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="add-pt.css"/>
+	<title> Cough Monitor Portal </title>
+</head>
+<body>
+
+	<nav class="navbar navbar-fixed-top navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="">Cough Monitor Portal</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="" onclick=logout()>Logout</a></li>
+          </ul>
+        </div><!-- /.nav-collapse -->
+      </div><!-- /.container -->
+    </nav><!-- /.navbar -->
+
+	<div class="container-fluid">
+		<div class="row">
+	        <div class="col-sm-3 col-md-2 sidebar">
+	          <ul class="nav nav-sidebar">
+	            <li ><a href="add-pt.html">Add Patient </a></li>
+	            <li class="active"><a href="#">Start Recording<span class="sr-only">(current)</span></a></li>
+	            <li><a href="data.html">Data</a></li>
+	          </ul>
+	        </div>
+	        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+	          <h1 class="page-header">Start Recording</h1>
+	          <form class="form-signin">
+		        <label for="device-no" class=""><p>Device Number</p>
+		        <input type="text" id="pt-name" class="form-control" placeholder="Full Name" required autofocus></label>
+		        <label for="pt-id" class=""><p>Pt ID #</p>
+		        <input type="number" id="pt-id" class="form-control" placeholder="Pt ID #" required></label>
+		        
+
+	          <button class="btn btn-primary" id="test-btn">Test Connection</button>
+	          <div>
+	          	<h2>Results</h2>
+	          </div>
+	          <button class="btn btn-primary" id="start-rec-btn">Start Recording</button>
+  	      	  </form>
+	        </div>
+	    </div>
+
+	<!--container-->
+	</div>
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<script>
+	$(document).ready(function(){
+		$('body').hide();
+			var xhttp = new XMLHttpRequest();
+  			xhttp.onreadystatechange = function() {
+	   		 	if (xhttp.readyState == 4 && xhttp.status == 200) {
+	   		 			$('body').show();
+		      			$('body').append(xhttp.responseText);
+			  	}else if (xhttp.status == 401) {
+			  		location.reload();
+			  	}
+			}
+		  xhttp.open("POST", "/php/l1.php", true);
+		  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		  xhttp.send();
+		})
+
+
+	function logout(){
+	    var xmlhttp;
+	    if (window.XMLHttpRequest) {
+	          xmlhttp = new XMLHttpRequest();
+	    }
+	    // code for IE
+	    else if (window.ActiveXObject) {
+	      xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	    }
+	    if (window.ActiveXObject) {
+	      // IE clear HTTP Authentication
+	      document.execCommand("ClearAuthenticationCache");
+	      $('body').append("success");
+	    } else {
+	        xmlhttp.onreadystatechange = function() {
+	            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+	            	$('body').append(xmlhttp.responseText);
+	            }
+	        }
+
+	        xmlhttp.open("POST", '/php/l1.php', true);
+	  	    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	        xmlhttp.send("logout=true");
+
+	    }
+	}
+	</script>
+</body>
+</html>

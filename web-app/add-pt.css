@@ -65,14 +65,21 @@ body {
   color: #fff;
   background-color: #428bca;
 }
+
 label p{
-  display: inline;
+  display: inline-block;
+  width:200px;
 }
 label{
   display: block;
 }
-form{
+.form-control {
+  display: inline-block;
   max-width: 330px;
+}
+
+button{
+  max-width: 200px;
 }
 
 /*
@@ -110,4 +117,7 @@ form{
 .placeholder img {
   display: inline-block;
   border-radius: 50%;
+}
+button {
+  margin-top: 15px;
 }
