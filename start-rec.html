@@ -1,0 +1,218 @@
+<!DOCTYPE html/>
+<html>
+<head lang="es">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="UTF-8">
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="add-pt.css"/>
+	<title class="sitename"> Cough Monitor Portal </title>
+</head>
+<body>
+	<nav class="navbar navbar-fixed-top navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href=""><p class="sitename">Cough Monitor Portal</p></a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a id="logout" href="" onclick=logout()>Logout</a></li>
+          </ul>
+        </div><!-- /.nav-collapse -->
+      </div><!-- /.container -->
+    </nav><!-- /.navbar -->
+
+	<div class="container-fluid">
+		<div class="row">
+	        <div class="col-sm-3 col-md-2 sidebar">
+	          <ul class="nav nav-sidebar">
+	            <li id="addpt"><a href="add-pt.html">Add Patient </a></li>
+	            <li id="startrec" class ="active"><a href="#">Start Recording<span class="sr-only">(current)</span></a></li>
+	            <li id="data"><a href="data.html">Data</a></li>
+	          </ul>
+	        </div>
+	        
+	        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        	<div class="other-form">
+		      <label for="switch" id="lang_switch_label">Change to English:</label>
+		        <input type="checkbox" data-role="flipswitch" name="switch" id="switch" onclick="changelanguage()"/>
+		    </div> 
+	          <h1 id="pgtitle" class="page-header">Start Recording</h1>
+	          <div class="form-signin">
+				<div id="upload">
+					<form id="up-form" enctype="multipart/form-data" method="POST">
+					    <!-- Name of input element determines name in $_FILES array -->
+					    <label><p id="ptid">Patient Id: </p><input class="form-control" type="number" id="pt-id-up" required/></label>
+					    <label><p id="recdt">Date Recorded: </p><input class="form-control" type="date" id="rec-date" required/></label>
+					    <label><p id="sample_code">Sample Code: </p><input class="form-control" type="number" id="sample-code" required/></label>
+					      <label><p id="hos_code">Hospital Code: </p><select id="hoscode">
+						    <option value="HC">HC</option>
+						    <option value="DM">DM</option>
+						  </select></label>
+					    <label><p id="rectime"></p><input class="form-control" type="time" id="rec-date" required/></lable>
+					    <label><p id="subfile">Submit this file: </p><input name="userfile" type="file" multiple id="f1" required/></label>
+					    <input id="filebut" class="btn btn-primary" type="submit" value="Send Files" />
+					</form>
+					<div id="up-response"></div>
+				</div>
+  	      	  </div>
+	        </div>
+	    </div>
+
+	<!--container-->
+	</div>
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<script>
+		var LANGUAGE = 1
+		function changelanguage(){
+			if (LANGUAGE == 1) {
+				LANGUAGE = 0;
+				$("#lang_switch_label").html("Cambiar a Español");
+				load_language();
+			}else{
+				LANGUAGE = 1;
+				$("#lang_switch_label").html("Change to English");
+				load_language();
+			}
+		}
+		var vocab = [["Add Patient", "Upload a Recording", "Patient Data", "logout", "Cough Monitor Portal", "Pt ID #", "Date of Recording","Start time of Recording", "Submit Files", "Sample Code", "Hospital Code"],["Nuevo Paciente","Cargar Una Grabación","Datos del Paciente","Cerrar Sesión", "Tos Monitor Portal", "Número de identificación del paciente", "La fecha de grabación", "Hora de la Grabación", "Enviar archivos","Codigo de Mestra", "Código del Hospital"]]
+		function load_language() {
+			$(".sitename").html(vocab[LANGUAGE][4]);
+			$("#addpt").html('<a href="add-pt.html">' + vocab[LANGUAGE][0] + '</a>');
+			$("#startrec").html("<a href='#'>"+vocab[LANGUAGE][1]+"<span class='sr-only'>(current)</span></a>");
+			$("#data").html("<a href='data.html'>"+vocab[LANGUAGE][2]+"</a>");
+			$("#pgtitle").html(vocab[LANGUAGE][1]);
+			$("#logout").html(vocab[LANGUAGE][3]);
+			$("#ptid").html(vocab[LANGUAGE][5]);
+			$("#recdt").html(vocab[LANGUAGE][6]);
+			$("#rectime").html(vocab[LANGUAGE][7]);
+			$("#subfile").html(vocab[LANGUAGE][8]);
+			$("#filebut").attr("value",vocab[LANGUAGE][8]);
+			$("#sample_code").html(vocab[LANGUAGE][9]);
+			$("#hos_code").html(vocab[LANGUAGE][10]);
+		}
+	var files;
+
+	// Add events
+	$('input[type=file]').on('change', prepareUpload);
+
+	function prepareUpload(event)
+	{
+	  files = event.target.files;
+	}
+	$("#up-form").submit(function( event ) {
+
+		event.stopPropagation(); // Stop stuff happening
+	    event.preventDefault(); // Totally stop stuff happening
+
+	    // get date in format YYYYMMDD:
+	    // var date_formatted = new Date($("#rec-date").val());
+	    // var year = date_formatted.getFullYear().toString();
+	    // var month = ("0" + (date_formatted.getMonth() + 1)).slice(-2)
+	    // var day = ("0" + date_formatted.getDate()).slice(-2);
+
+	    // Create a formdata object and add the files
+	    var data = new FormData();
+	    data.append("id", $("#pt-id-up").val());
+	   // data.append("date", ""+year + month + day);
+	   	data.append("date", $("#rec-date").val());
+	    data.append("sample-code", $("#sample-code").val());
+	    data.append("hos-code", $("#hoscode").find(":selected").text());
+	    $.each(files, function(key, value)
+	    {
+	        data.append(key, value);
+	    });
+
+	    $.ajax({
+	        url: 'php/post_rec.php',
+	        type: 'POST',
+	        data: data,
+	        cache: false,
+	        datatype: 'json',
+	        processData: false, // Don't process the files
+	        contentType: false, // Set content type to false as jQuery will tell the server its a query string request
+	        success: function(data, textStatus, jqXHR)
+	        {
+	            if(typeof data.error === 'undefined')
+	            {
+	            	var response = JSON.parse(data);
+	            	if(response.success == false){
+	            		$("#up-response").html("<h3>"+response.message+"</h3>");
+	            	}else if(response.success == true){
+	            		alert("Patient Audio successfully uploaded!");
+						location.reload();	
+	            	}
+	            }
+	            else
+	            {
+	                // Handle errors here
+	                console.log('ERRORS: ' + data.error);
+	            }
+	        },
+	        error: function(jqXHR, textStatus, errorThrown)
+	        {
+	            // Handle errors here
+	            console.log('ERRORS: ' + textStatus);
+	        }
+	    });
+	})
+
+	$(document).ready(function(){
+		load_language();
+		$('body').hide();
+			var xhttp = new XMLHttpRequest();
+  			xhttp.onreadystatechange = function() {
+	   		 	if (xhttp.readyState == 4 && xhttp.status == 200) {
+	   		 			$('body').show();
+		      			$('body').append(xhttp.responseText);
+			  	}else if (xhttp.status == 401) {
+			  		location.reload();
+			  	}
+			}
+		  xhttp.open("POST", "php/l1.php", true);
+		  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		  xhttp.send();
+		})
+
+
+	function logout(){
+	    var xmlhttp;
+	    if (window.XMLHttpRequest) {
+	          xmlhttp = new XMLHttpRequest();
+	    }
+	    // code for IE
+	    else if (window.ActiveXObject) {
+	      xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	    }
+	    if (window.ActiveXObject) {
+	      // IE clear HTTP Authentication
+	      document.execCommand("ClearAuthenticationCache");
+	      $('body').append("success");
+	    } else {
+	        xmlhttp.onreadystatechange = function() {
+	            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+	            	$('body').append(xmlhttp.responseText);
+	            }
+	        }
+
+	        xmlhttp.open("POST", 'php/l1.php', true);
+	  	    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	        xmlhttp.send("logout=true");
+
+	    }
+	}
+	</script>
+</body>
+</html>

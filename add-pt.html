@@ -1,0 +1,179 @@
+<!DOCTYPE html/>
+<html>
+<head lang="en">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="UTF-8">
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="add-pt.css"/>
+	<title class="sitename"> Cough Monitor Portal </title>
+</head>
+<body>
+	<nav class="navbar navbar-fixed-top navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href=""><p class="sitename">Cough Monitor Portal</p></a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a id="logout" href="" onclick=logout()>Logout</a></li>
+          </ul>
+        </div><!-- /.nav-collapse -->
+      </div><!-- /.container -->
+    </nav><!-- /.navbar -->
+
+	<div class="container-fluid">
+		<div class="row">
+	        <div class="col-sm-3 col-md-2 sidebar">
+	          <ul class="nav nav-sidebar">
+	            <li class="active" id="addpt"><a href="#">Add Patient <span class="sr-only">(current)</span></a></li>
+	            <li id="startrec"><a href="start-rec.html">Start Recording</a></li>
+	            <li id="data"><a href="data.html">Data</a></li>
+	          </ul>
+	        </div>
+	        <div id="add-pt" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        	<div class="other-form">
+		      <label for="switch" id="lang_switch_label">Change to English:</label>
+		        <input type="checkbox" data-role="flipswitch" name="switch" id="switch" onclick="changelanguage()"/>
+		    </div> 
+	          <h1 id="pgtitle" class="page-header">Add Patient</h1>
+	          <div class="form-signin">
+		        <label for="pt-id" class=""><p id="ptid" >Pt ID #</p>
+		        	<input type="number" id="pt-id" class="form-control" placeholder="Pt ID #" required></label>
+		        <!-- <label for="pt-dob"><p id="ptdob">Date of Birth</p>
+		        	<input type="date" id="pt-dob" class="form-control" placeholder="Pt DOB" required></label> -->
+		        <label for="diagnosis-date"><p id="ptdd">Date of diagnosis</p>
+		        	<input type="date" id="diagnosis-date" class="form-control" required></label>
+		        <label for="tx-start"><p id="pttx">Treatment start date</p>
+		        	<input type="date" id="tx-start" class="form-control" required></label>
+		        <label for="notes"><p id="ptnotes">Clinician Notes</p>
+					<textarea type="text" id="notes" class="form-control"></textarea></label>
+	            <p id="submit-fail"></p>
+		        <button id="subpt" class="btn btn-lg btn-primary btn-block" onclick=submit_user()>Add Patient</button>
+	      	  </div>
+	        </div>
+	    </div>
+
+	<!--container-->
+	</div>
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+		<script>
+		var LANGUAGE = 1
+		function changelanguage(){
+			if (LANGUAGE == 1) {
+				LANGUAGE = 0;
+				$("#lang_switch_label").html("Cambiar a Español");
+				load_language();
+			}else{
+				LANGUAGE = 1;
+				$("#lang_switch_label").html("Change to English");
+				load_language();
+			}
+		}
+		var vocab = [["Add Patient", "Upload a Recording", "Patient Data", "logout", "Patient Name", "Pt ID #", "Date of Birth", "Patient Weight", "Patient Height", "Date of Diagnosis", "Treatment Start Date", "Clinician Notes", "Cough Monitor Portal", "Full Name" ,"ID Number"],["Nuevo Paciente","Cargar Una Grabación","Datos del Paciente","Cerrar Sesión","Nombre del Paciente", "Número de identificación del paciente", "Fecha de Nacimiento","Peso del Paciente", "Altura del Paciente", "Fecha de Diagnóstico", "Tratamiento Fecha de Inicio", "Notas Clínico", "Tos Monitor Portal", "Nombre Completo", "Número de identificación"]]
+		function load_language() {
+			$(".sitename").html(vocab[LANGUAGE][12]);
+			$("#addpt").html('<a href="#">' + vocab[LANGUAGE][0] + '<span class="sr-only">(current)</span></a>');
+			$("#startrec").html("<a href='start-rec.html'>"+vocab[LANGUAGE][1]+"</a>");
+			$("#data").html("<a href='data.html'>"+vocab[LANGUAGE][2]+"</a>");
+			$("#pgtitle").html(vocab[LANGUAGE][0]);
+			$("#logout").html(vocab[LANGUAGE][3]);
+			$("#ptid").html(vocab[LANGUAGE][5]);
+			//$("#ptdob").html(vocab[LANGUAGE][6]);
+			// $("#ptwt").html(vocab[LANGUAGE][7]);
+			// $("#ptht").html(vocab[LANGUAGE][8]);
+			$("#ptdd").html(vocab[LANGUAGE][9]);
+			$("#pttx").html(vocab[LANGUAGE][10]);
+			$("#ptnotes").html(vocab[LANGUAGE][11]);
+			$("#subpt").html(vocab[LANGUAGE][0]);
+			$("#pt-name").attr("placeholder", vocab[LANGUAGE][13]);
+			$("#pt-id").attr("placeholder", vocab[LANGUAGE][14]);
+		}
+		$(document).ready(function(){
+			load_language();
+			$('body').hide();
+				var xhttp = new XMLHttpRequest();
+	  			xhttp.onreadystatechange = function() {
+		   		 	if (xhttp.readyState == 4 && xhttp.status == 200) {
+		   		 			$('body').show();
+			      			$('body').append(xhttp.responseText);
+				  	}else if (xhttp.status == 401) {
+				  		location.reload();
+				  	}
+				}
+			  xhttp.open("POST", "php/l1.php", true);
+			  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			  xhttp.send();
+		})
+		function submit_user(){
+			var id = document.getElementById("pt-id").value;
+			//var dob = $("#pt-dob").val();
+			var wt = $("#pt-wt").val();
+			var ht = $("#pt-ht").val();
+			var diagnosis_date = $("#diagnosis-date").val();
+			var tx_start = $("#tx-start").val();
+			var notes = $("#notes").val();
+			console.log(diagnosis_date);
+			var xhttp = new XMLHttpRequest();
+  			xhttp.onreadystatechange = function() {
+	   		 	if (xhttp.readyState == 4 && xhttp.status == 200) {
+	   		 		response = JSON.parse(xhttp.responseText);
+	   		 		if(response.success == false){
+		      			document.getElementById("submit-fail").innerHTML = response.message;
+					} else{
+						alert("Patient Added!");
+						window.location.reload();
+					}
+			  	
+				}
+			}
+			  xhttp.open("POST", "php/register.php", true);
+			  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			  xhttp.send("pt_id="+id+"&diagnosis_date="+diagnosis_date+"&tx_start="+tx_start+"&notes="+notes);
+			
+		}
+
+
+	function logout(){
+	    var xmlhttp;
+	    if (window.XMLHttpRequest) {
+	          xmlhttp = new XMLHttpRequest();
+	    }
+	    // code for IE
+	    else if (window.ActiveXObject) {
+	      xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	    }
+	    if (window.ActiveXObject) {
+	      // IE clear HTTP Authentication
+	      document.execCommand("ClearAuthenticationCache");
+	      $('body').append("success");
+	    } else {
+	        xmlhttp.onreadystatechange = function() {
+	            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+	            	$('body').append(xmlhttp.responseText);
+	            }
+	        }
+
+	        xmlhttp.open("POST", 'php/l1.php', true);
+	  	    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	        xmlhttp.send("logout=true");
+
+	    }
+	}
+	</script>
+	
+</body>
+</html>

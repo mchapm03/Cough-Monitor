@@ -1,0 +1,401 @@
+<!DOCTYPE html/>
+<html>
+<head lang="es">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="UTF-8">
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+	<!-- chartist css -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/chartist.js/0.9.5/chartist.min.css">
+	<link rel="stylesheet" href="data.css"/>
+	<title class="sitename"> Cough Monitor Portal </title>
+</head>
+<body onload=setup()>
+	<nav class="navbar navbar-fixed-top navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href=""><p class="sitename">Cough Monitor Portal</p></a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a id="logout" href="" onclick=logout()>Logout</a></li>
+          </ul>
+        </div><!-- /.nav-collapse -->
+      </div><!-- /.container -->
+    </nav><!-- /.navbar -->
+
+	<div class="container-fluid">
+		<div class="row">
+	        <div class="col-sm-3 col-md-2 sidebar">
+	          <ul class="nav nav-sidebar">
+	            <li id="addpt"><a href="add-pt.html">Add Patient </a></li>
+	            <li id="startrec"><a href="start-rec.html">Start Recording</a></li>
+	            <li id="data" class="active"><a href="#">Data<span class="sr-only">(current)</span></a></li>
+	          </ul>
+	        </div><!--sidebar-->
+	        <!-- Main Content -->
+	        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        	<div class="other-form">
+		      <label for="switch" id="lang_switch_label">Change to English:</label>
+		        <input type="checkbox" data-role="flipswitch" name="switch" id="switch" onclick="changelanguage()"/>
+		    </div> 	        	
+	          <h1 id="pgtitle" class="page-header">Data</h1>
+	          <div id="mainstatsbody">
+	          	<button class="btn btn-primary" class="form-control" id="get-stats" onclick=get_stats()>Get Overall Statistics</button>
+	          	<div >
+	          		<table id="overall-stats">
+	          		</table>
+	          	</div>
+	          </div><!--mainstatsbody-->
+	          <div id="stat-results"></div>
+	          <div id="mainbody">
+	          	<label for="pt-id" ><p id="ptid">Patient ID #:</p>
+	          	<input type="text" class="form-control" placeholder="Patient ID #" id="pt-id" required autofocus/></label>
+	          	<button class="btn btn-primary" class="form-control" id="get-pt-data" onclick=get_pt_stats()>Get Patient Data</button>
+	          		<div id="pt-stats">
+	          			<table>
+	          				<th id="ptdd">Diagnosis Date</th>
+	          				<th id="pttx">Treatment Start Date</th>
+	          				<th id="no-recs">Number of Recordings</th>
+	          				<th id="ptnotes">Notes</th>
+	          				<tr>
+			          			<td id="pt-diag-date"></td>
+			          			<td id="pt-tx-start"></td>
+			          			<td id="pt-no-recs"></td>
+			          			<td id="pt-notes"></td>
+		          			</tr>
+	          			</table>
+	          		</div>
+	          	<div id="pt-fail-message"></div>
+	          	<h1 id="coughRates">Cough Rates</h1>
+		          <table id="cough_table">
+		          </table>	          	
+	          	<div class="ct-chart ct-perfect-fourth"></div>
+      		<!-- 	<div id="download">
+
+					<div id="down-response"></div>
+				</div>-->
+	          </div><!--mainbody-->
+
+	          <div id="pt-data"></div>
+	        </div><!--main-->
+	    </div><!--row-->
+
+	<!--container-->
+	</div>
+	<!-- Chart library -->
+    <script src="https://cdn.jsdelivr.net/chartist.js/0.9.5/chartist.min.js"></script>
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+	<script>
+		var LANGUAGE = 1
+		function changelanguage(){
+			if (LANGUAGE == 1) {
+				LANGUAGE = 0;
+				$("#lang_switch_label").html("Cambiar a Español");
+				load_language();
+			}else{
+				LANGUAGE = 1;
+				$("#lang_switch_label").html("Change to English");
+				load_language();
+			}
+		}
+		var vocab = [["Add Patient", "Upload a Recording", "Patient Data", "logout", "Cough Monitor Portal", "Overall Statistics","Pt ID #", "Number of Patients","Number of Recordings", "Get Patient Data","Date of Recording","Start time of Recording", "Submit Files", "Date of Birth", "Patient Weight", "Patient Height", "Date of Diagnosis", "Treatment Start Date", "Clinician Notes", "Please enter a patient ID #.", "Date", "Cough Count", "Cough Rates"],["Nuevo Paciente","Cargar Una Grabación","Datos del Paciente","Cerrar Sesión", "Tos Monitor Portal", "Estadísticas Generales","Número de identificación del paciente", "Número de pacientes","Número de grabaciones","Obtener Datos del Paciente","La fecha de grabación", "Hora de la Grabación", "Enviar archivos","Fecha de Nacimiento","Peso del Paciente", "Altura del Paciente", "Fecha de Diagnóstico", "Tratamiento Fecha de Inicio", "Notas Clínico", "Por favor, introduzca un paciente identificación.", "Fecha", "Número total de la tos", "Las Tasas para La Tos"]]
+		function load_language() {
+			$(".sitename").html(vocab[LANGUAGE][4]);
+			$("#addpt").html('<a href="add-pt.html">' + vocab[LANGUAGE][0] + '</a>');
+			$("#startrec").html("<a href='start-rec.html'>"+vocab[LANGUAGE][1]+"</a>");
+			$("#data").html("<a href='#'>"+vocab[LANGUAGE][2]+"<span class='sr-only'>(current)</span></a>");
+			$("#pgtitle").html(vocab[LANGUAGE][2]);
+			$("#logout").html(vocab[LANGUAGE][3]);
+			$("#get-stats").html(vocab[LANGUAGE][5]);
+			$("#ptid").html(vocab[LANGUAGE][6]);
+			$("#get-pt-data").html(vocab[LANGUAGE][9]);
+			$("#pt-id").attr("placeholder", vocab[LANGUAGE][6]);
+			// $("#ptwt").html(vocab[LANGUAGE][14]);
+			// $("#ptht").html(vocab[LANGUAGE][15]);
+			$("#ptdd").html(vocab[LANGUAGE][16]);
+			$("#pttx").html(vocab[LANGUAGE][17]);
+			$("#ptnotes").html(vocab[LANGUAGE][18]);
+			$("#no-recs").html(vocab[LANGUAGE][8]);
+			$("#dt").html(vocab[LANGUAGE][20]);
+			$("#cc").html(vocab[LANGUAGE][21]);
+			$("#coughRates").html(vocab[LANGUAGE][22]);
+		}
+	$(document).ready(function(){
+		$('body').hide();
+		var xhttp;
+	    if (window.XMLHttpRequest) {
+          xhttp = new XMLHttpRequest();
+	    }
+	    // code for IE
+	    else if (window.ActiveXObject) {
+	      xhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	    }
+  			xhttp.onreadystatechange = function() {
+	   		 	if (xhttp.readyState == 4 && xhttp.status == 200) {
+   		 			$('body').show();
+	      			$('body').append(xhttp.responseText);
+			  	}else if (xhttp.status == 401) {
+			  		location.reload();
+			  	}
+			}
+		  xhttp.open("POST", "php/l1.php", true);
+		  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		  xhttp.send();
+		})
+		// hide statistics tables on pg load
+		function setup(){
+			//hide the tables until the user loads them
+			$("#overall-stats").hide();
+			$("#pt-stats").hide();
+			$("#cough_table").hide();
+			$("#coughRates").hide();
+			load_language();
+
+		}
+		// function to get overall statistics
+		function get_stats(){
+			$("#overall-stats").html("<th>"+vocab[LANGUAGE][7]+"</th><th>"+vocab[LANGUAGE][8]+"</th>");
+			var xhttp = new XMLHttpRequest();
+  			xhttp.onreadystatechange = function() {
+	   		 	if (xhttp.readyState == 4 && xhttp.status == 200) {
+	   		 		response = JSON.parse(xhttp.responseText);
+	   		 		if(response.success == true){
+	   					$("#overall-stats").show();
+						document.getElementById("overall-stats").innerHTML += "<tr><td>"+response.no_pts+"</td><td>"+response.no_recs+"</td></tr>";
+					}
+			  	}
+			}
+		    xhttp.open("POST", "php/get_stats.php", true);
+		    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		    xhttp.send();
+		}
+		// function to get individual patient statistics
+		function get_pt_stats(){
+			if($("#pt-id").val() != ''){
+				$("#pt-fail-message").html("");
+				$("#down-response").html("");
+					var xhttp = new XMLHttpRequest();
+					xhttp.onreadystatechange = function() {
+						if(xhttp.readyState == 4 && xhttp.status == 200) {
+							response = JSON.parse(xhttp.responseText);
+							if(response.success == true){
+								download();
+								make_chart();
+								var dia_date = new Date(response.diagnosis_date);
+								var tx_date = new Date(response.tx_start);
+								$("#pt-stats").show();
+								$("#pt-tx-start").html(tx_date.toLocaleDateString());
+								$("#pt-no-recs").html(response.no_recordings);
+								$("#pt-notes").html(response.notes);
+								// $("#pt-wt").html(response.wt+" kg");
+								// $("#pt-ht").html(response.ht + " m");
+								$("#pt-diag-date").html(dia_date.toLocaleDateString());
+							}else{
+								$("#pt-stats").hide();
+								$("#pt-fail-message").html("<h3>"+response.message+"</h3>");
+							}
+						}
+					}
+					xhttp.open("GET", "php/db_get_patient_cough_data.php?pt-id="+$("#pt-id").val(), true);
+					//xhttp.open("GET", "/php/db_get_patient_cough_data.php?pt-id="+$("#pt-id").val(), true);
+
+					xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+					xhttp.send();
+				}else{
+					$("#pt-fail-message").html("<h3>"+vocab[LANGUAGE][19]+"</h3>");
+				}
+		}
+	//TODO: make compatible with only one recording
+	//TODO: make compatible with no recordings
+	function make_chart(){
+		$("#cough_table").html('<th id="dt">Date</th><th id="cc">Cough Count</th>');
+		//event.preventDefault();
+		data = new FormData();
+		data.append("pt-id", $("#pt-id").val());
+	    $.ajax({
+	        //url: 'http://localhost/php/get_rec_sum.php',
+	        //url: 'http://www.skysip.org/p539/php/get_rec_sum.php',
+	        url: 'php/get_rec_sum.php',
+	        type: 'POST',
+	        data: data,
+	        cache: false,
+	        datatype: 'json',
+	        processData: false, // Don't process the files
+	        contentType: false, // Set content type to false as jQuery will tell the server its a query string request
+	        success: function(data, textStatus, jqXHR)
+	        {
+	            if(typeof data.error === 'undefined')
+	            {
+	            	response = JSON.parse(data);
+	            	if(response.success == true){
+	            		$("#cough_table").show();
+	            		$("#coughRates").show();
+	            		delete response['success'];
+	            		var objs = [];
+	            		var l = [];
+	            		var dates = [];
+	            		var s = [];
+	            		for(var key in response){
+	            			objs.push({'date':new Date(key), 'cough_rate':response[key]});
+	            		}
+	            		objs.sort(function(a,b){
+	            			return a['date']-b['date'];
+	            		})
+	            		for(var i in objs){
+	            			var date = new Date(objs[i]['date'])
+            				$("#cough_table").append("<tr><td>"+date.toLocaleDateString()+"</td><td>"+objs[i]['cough_rate']+"</td></tr>")
+	            		}
+	            		var day = new Date(objs[0]['date']);
+	            		var endday = objs[objs.length - 1]['date']
+	            		var j = 0;
+	            		while(day < endday){
+	            			if(day != objs[j]['date']){
+	            				var newday = {};
+	            				newday['cough_rate'] = null;
+	            				newday['date']= new Date(day);
+	            				objs.splice(j,0,newday);
+	            			}
+            				j++;
+            				day.setDate(day.getDate()+1);
+	            		}
+	            		objs.sort(function(a,b){
+	            			return a['date']-b['date'];
+	            		})
+	            		for(var i = 0; i<objs.length;i++){
+		            			var date = new Date(objs[i]['date'])
+	            				l.push(date.toLocaleDateString());
+	            				s.push(objs[i]['cough_rate']);
+	            		}
+	            		var data = {
+						  labels: (l),
+						  series: [
+						    s
+						  ]
+						};
+						if(l.length > 1) {
+							new Chartist.Line('.ct-chart', data, {
+							  fullWidth: true,
+							  chartPadding: {
+							    right: 10
+							  },
+							  lineSmooth: Chartist.Interpolation.simple({
+							    fillHoles: true,
+							  }),
+							  low: -0, 
+							 // fixedscaleaxis : 
+							});
+						}
+
+					}else{
+						$("#down-response").html("<h3>"+response.message+"</h3>");
+					}
+	            }
+	            else
+	            {
+	                // Handle errors here
+	                console.log('ERRORS: ' + data.error);
+	            }
+	        },
+	        error: function(jqXHR, textStatus, errorThrown)
+	        {
+	            // Handle errors here
+	            console.log('ERRORS: ' + textStatus);
+	            // STOP LOADING SPINNER
+	        }
+	    });
+	}
+
+	// function to get audio recordings
+	function download(){
+		//event.preventDefault();
+		data = new FormData();
+		data.append("id", $("#pt-id").val());
+	    $.ajax({
+	        url: 'php/get_rec.php',
+	        type: 'POST',
+	        data: data,
+	        cache: false,
+	        datatype: 'json',
+	        processData: false, // Don't process the files
+	        contentType: false, // Set content type to false as jQuery will tell the server its a query string request
+	        success: function(data, textStatus, jqXHR)
+	        {
+	            if(typeof data.error === 'undefined')
+	            {
+	            	response = JSON.parse(data);
+	            	if(response.success == true){
+	            		//clear all recordings
+	            		// $("#down-response").html("<h2>Patient Audio Recordings</h2>");
+		            	// for (var i in response.message) {
+		            	// 	rec = response.message[i];
+		            		//if(rec.search(".mp3") >= 0){
+		            			//console.log(rec);
+		            			//using server:
+								//$("#down-response").append('<p>'+rec+'</p><audio controls><source src="http://skysip.org/p539/patient_data/audio/'+$("#pt-id").val()+'/'+rec+'" type="audio/wav"></audio></br>');
+								// $("#down-response").append('<p>'+rec+'</p><audio controls><source src="patient_data/audio/'+$("#pt-id").val()+'/'+rec+'" type="audio/wav"></audio></br>');
+								//locally:
+								//$("#down-response").append('<p>'+rec+'</p><audio controls><source src="http://localhost/php/audio/'+$("#pt-id").val()+'/'+rec+'" type="audio/wav"></audio></br>');
+							//}	
+						// }
+					}else{
+
+						$("#down-response").html("<h3>"+response.message+"</h3>");
+					}
+	            }
+	            else
+	            {
+	                // Handle errors here
+	                console.log('ERRORS: ' + data.error);
+	            }
+	        },
+	        error: function(jqXHR, textStatus, errorThrown)
+	        {
+	            // Handle errors here
+	            console.log('ERRORS: ' + textStatus);
+	        }
+	    });
+	}
+	// logout function
+	function logout(){
+	    var xmlhttp;
+	    if (window.XMLHttpRequest) {
+	          xmlhttp = new XMLHttpRequest();
+	    }
+	    // code for IE
+	    else if (window.ActiveXObject) {
+	      xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	    }
+	    if (window.ActiveXObject) {
+	      // IE clear HTTP Authentication
+	      document.execCommand("ClearAuthenticationCache");
+	      $('body').append("success");
+	    } else {
+	        xmlhttp.onreadystatechange = function() {
+	            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+	            	$('body').append(xmlhttp.responseText);
+	            }
+	        }
+	        xmlhttp.open("POST", 'php/l1.php', true);
+	  	    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	        xmlhttp.send("logout=true");
+
+	    }
+	}
+	</script>
+	
+</body>
+</html>
