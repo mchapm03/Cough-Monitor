@@ -19,7 +19,7 @@ $db = new DB_CONNECT();
 $response = array();
 if(isset($_POST['id'])){
 	$rec_output_dir  = $_SERVER['DOCUMENT_ROOT'];
-	$rec_output_dir .= "/p539/patient_data/audio/" . $_POST['id'] . "/";
+	$rec_output_dir .= "/tufts_cough/patient_data/audio/" . $_POST['id'] . "/";
 	if(file_exists($rec_output_dir)) {
 		$response['success'] = true;
 		$response['message'] = array_diff(scandir($rec_output_dir), array('..', '.'));

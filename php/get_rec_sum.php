@@ -25,12 +25,12 @@ $db = new DB_CONNECT();
 if (isset($_POST["pt-id"])) {
     $id = mysql_real_escape_string($_POST['pt-id']);
     //try to find user
-    $result = mysql_query("SELECT * from P" . $id . "_SUMMARY ") or die(mysql_error());
+    $result = mysql_query("SELECT * from P" . $id ) or die(mysql_error());
     if($result){
       $response = array();
       $response["success"]=true;
       while($row = mysql_fetch_assoc($result)){
-        $response[$row['date']] = $row['cough_rate'];
+        $response[$row['date']] = [$row['COUGH_COUNT'], $row['QUALITY']];
       }
       echo json_encode($response);
 

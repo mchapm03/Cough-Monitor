@@ -27,6 +27,7 @@ function create_new_patient_table($id) {
     $row = mysql_fetch_array($result);
     $ID = $row["ID"];
 
+    //TODO: remove use of summary tables
     //create a table for the new patient using patient ID as the table name
     $new_table = "P" . $id;
     $sql = "CREATE TABLE " . $new_table . " SELECT * FROM " . TBL_P_TEMPLATE .

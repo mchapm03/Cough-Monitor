@@ -112,7 +112,7 @@
 				load_language();
 			}
 		}
-		var vocab = [["Add Patient", "Upload a Recording", "Patient Data", "logout", "Cough Monitor Portal", "Overall Statistics","Pt ID #", "Number of Patients","Number of Recordings", "Get Patient Data","Date of Recording","Start time of Recording", "Submit Files", "Date of Birth", "Patient Weight", "Patient Height", "Date of Diagnosis", "Treatment Start Date", "Clinician Notes", "Please enter a patient ID #.", "Date", "Cough Count", "Cough Rates"],["Nuevo Paciente","Cargar Una Grabación","Datos del Paciente","Cerrar Sesión", "Tos Monitor Portal", "Estadísticas Generales","Número de identificación del paciente", "Número de pacientes","Número de grabaciones","Obtener Datos del Paciente","La fecha de grabación", "Hora de la Grabación", "Enviar archivos","Fecha de Nacimiento","Peso del Paciente", "Altura del Paciente", "Fecha de Diagnóstico", "Tratamiento Fecha de Inicio", "Notas Clínico", "Por favor, introduzca un paciente identificación.", "Fecha", "Número total de la tos", "Las Tasas para La Tos"]]
+		var vocab = [["Add Patient", "Upload a Recording", "Patient Data", "logout", "Cough Monitor Portal", "Overall Statistics","Pt ID #", "Number of Patients","Number of Recordings", "Get Patient Data","Date of Recording","Start time of Recording", "Submit Files", "Date of Birth", "Patient Weight", "Patient Height", "Date of Diagnosis", "Treatment Start Date", "Clinician Notes", "Please enter a patient ID #.", "Date", "Cough Count", "Cough Rates", "Quality Code"],["Nuevo Paciente","Cargar Una Grabación","Datos del Paciente","Cerrar Sesión", "Tos Monitor Portal", "Estadísticas Generales","Número de identificación del paciente", "Número de pacientes","Número de grabaciones","Obtener Datos del Paciente","La fecha de grabación", "Hora de la Grabación", "Enviar archivos","Fecha de Nacimiento","Peso del Paciente", "Altura del Paciente", "Fecha de Diagnóstico", "Tratamiento Fecha de Inicio", "Notas Clínico", "Por favor, introduzca un paciente identificación.", "Fecha", "Número total de la tos", "Las Tasas para La Tos", "Codigo de Calidad"]]
 		function load_language() {
 			$(".sitename").html(vocab[LANGUAGE][4]);
 			$("#addpt").html('<a href="add-pt.html">' + vocab[LANGUAGE][0] + '</a>');
@@ -132,6 +132,7 @@
 			$("#no-recs").html(vocab[LANGUAGE][8]);
 			$("#dt").html(vocab[LANGUAGE][20]);
 			$("#cc").html(vocab[LANGUAGE][21]);
+			$("#quality").html(vocab[LANGUAGE][23]);
 			$("#coughRates").html(vocab[LANGUAGE][22]);
 		}
 	$(document).ready(function(){
@@ -222,7 +223,7 @@
 	//TODO: make compatible with only one recording
 	//TODO: make compatible with no recordings
 	function make_chart(){
-		$("#cough_table").html('<th id="dt">Date</th><th id="cc">Cough Count</th>');
+		$("#cough_table").html('<th id="dt">Date</th><th id="cc">Cough Count</th><th id="qual">Quality</th>');
 		//event.preventDefault();
 		data = new FormData();
 		data.append("pt-id", $("#pt-id").val());
@@ -250,14 +251,14 @@
 	            		var dates = [];
 	            		var s = [];
 	            		for(var key in response){
-	            			objs.push({'date':new Date(key), 'cough_rate':response[key]});
+	            			objs.push({'date':new Date(key), 'cough_rate':response[key][0], 'quality':response[key][1]});
 	            		}
 	            		objs.sort(function(a,b){
 	            			return a['date']-b['date'];
 	            		})
 	            		for(var i in objs){
 	            			var date = new Date(objs[i]['date'])
-            				$("#cough_table").append("<tr><td>"+date.toLocaleDateString()+"</td><td>"+objs[i]['cough_rate']+"</td></tr>")
+            				$("#cough_table").append("<tr><td>"+date.toLocaleDateString()+"</td><td>"+objs[i]['cough_rate']+"</td><td>"+objs[i]['quality']+"</tr>")
 	            		}
 	            		var day = new Date(objs[0]['date']);
 	            		var endday = objs[objs.length - 1]['date']

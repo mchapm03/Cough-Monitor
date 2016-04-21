@@ -58,7 +58,7 @@
 						    <option value="HC">HC</option>
 						    <option value="DM">DM</option>
 						  </select></label>
-					    <label><p id="rectime"></p><input class="form-control" type="time" id="rec-date" required/></lable>
+					    <!-- <label><p id="rectime"></p><input class="form-control" type="time" id="rec-date" required/></lable> -->
 					    <label><p id="subfile">Submit this file: </p><input name="userfile" type="file" multiple id="f1" required/></label>
 					    <input id="filebut" class="btn btn-primary" type="submit" value="Send Files" />
 					</form>
@@ -149,10 +149,17 @@
 	            {
 	            	var response = JSON.parse(data);
 	            	if(response.success == false){
-	            		$("#up-response").html("<h3>"+response.message+"</h3>");
+	            		$("#up-response").html("<h3>"+response.message.error+"</h3>");
 	            	}else if(response.success == true){
-	            		alert("Patient Audio successfully uploaded!");
-						location.reload();	
+	            		if(response.quality == 0){
+		            		alert("Patient Audio successfully uploaded! Number of coughs detected: " + response.coughs);
+						}else if (response.quality == 1){
+							alert("Patient Audio file quality too poor. Flag 1 given, max value too low.");
+						}else {
+							alert("Patient audio file has abnormal variation in noise floor.");
+						}
+						//location.reload();	
+
 	            	}
 	            }
 	            else

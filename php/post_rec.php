@@ -5,6 +5,12 @@
     by the patient id. If new files are added, the no_recordings count in the
     TBL_PATIENTS table is updated. 
 
+    fileQualityFlag - in this code, 0,1, or 2. description of this is (from processWavFile.m)
+    fileQualityFlag: quality metric for overall file:
+     0 = OK
+     1=max value too low
+     2= abnormal variation in noise floor
+
    Params:
      id= patient id
      date = date recording taken
@@ -105,10 +111,18 @@ if(mysql_num_rows($result) == 0) {
                 // simulate cough rate
                 // TODO: get cough rate from MATLAB algorithm
                 $runMatlab = exec("cd matlab & runAllWavInDATADIR.exe");
-
-                $cough_amt = rand(30, 70);
-                $Total_coughs += $cough_amt;
-                $sql = "INSERT INTO " . $patient_table . " (date, FILE_NAME, COUGH_COUNT) " . "VALUES ('" . $DATE . "', '" . $file['name'] . "', '" . $cough_amt . "');";
+                $stringWithOutExt = rtrim($file['name'], '.wav');
+                $outputFile = file_get_contents(getcwd() . '/matlab/DATADIR_proc/AlgoOut_' . $stringWithOutExt . '.txt') or die ("Unable to read matlab output file!");
+                $outputFile = str_replace("\r", "", $outputFile);
+                $outputFile = str_replace(" ", "", $outputFile);
+                $outputArray = explode("\n", $outputFile);
+                $qualityNumber = $outputArray[0];
+                $coughNumber = $outputArray[2];
+                $response['quality'] = floatval($qualityNumber);
+                $response['coughs'] = floatval($coughNumber);
+                // $cough_amt = rand(30, 70);
+                // $Total_coughs += $cough_amt;
+                $sql = "INSERT INTO " . $patient_table . " (date, FILE_NAME, COUGH_COUNT, QUALITY) " . "VALUES ('" . $DATE . "', '" . $file['name'] . "', '" . floatval($coughNumber) . "', '" . floatval($qualityNumber) . "');";
                 mysql_query($sql) or die(mysql_error());
 
             }else{
@@ -116,7 +130,12 @@ if(mysql_num_rows($result) == 0) {
             }
         
     }
-
+    // remove all files from /DATADIR_proc
+    $oldOutputfiles = glob(getcwd() . '/matlab/DATADIR_proc/*'); // get all file names
+    foreach($oldOutputfiles as $outputfile){ // iterate files
+      if(is_file($outputfile))
+        unlink($outputfile); // delete file
+    }
     //if files successfully uploaded to getcwd() . '/matlab/DATADIR', run matlab script
     //get stuff out of output folder
 
@@ -124,13 +143,6 @@ if(mysql_num_rows($result) == 0) {
     $response['success'] = !$error;
     // If error, return error message, else return an array of file names
     $response['message'] = ($error) ? array('error' => 'There was an error uploading your files' . $uploaddir) : array('files' => $files);
-
-    // Record a summary to the $P<ID>_SUMMARY table
-    $pt_summary_table = $patient_table . "_SUMMARY";
-    // TODO: get a more exact rate from hardware
-    $cough_rate = ((float)$Total_coughs) / 24.0;
-    $summary_sql = "INSERT INTO " . $pt_summary_table . " (date, cough_rate, total_coughs) VALUES ('" . $DATE . "', '" . $cough_rate . "', '" . $Total_coughs . "');";
-    mysql_query($summary_sql) or die(mysql_error());
 
     //update the no_recordings column for the patient in the TBL_PATIENTS table
     $no_recs_sql = mysql_query("SELECT no_recordings FROM " . TBL_PATIENTS . " WHERE id=" . $ID . ";") or die(mysql_error());
