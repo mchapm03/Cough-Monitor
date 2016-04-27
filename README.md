@@ -13,5 +13,11 @@ This project was done in collaberation with a project led by German Comina, a Ph
           2. System specifics
 ****************************************************
 
-The web app is currently hosted at www.healthglobalweb.com. This is an Apache server owned by German and located in Peru. The front end of the server is built using bootstrap (www.getbootstrap.com) and jquery. The chartist library is used to display patient data. The backend of the web server is written in php, and the patient information is stored on a MySQL database. The cough recordings are analyzed using a compiled matlab executable, found at http://healthglobalweb.com/tufts_cough/php/matlab. 
+The web app is currently hosted at www.healthglobalweb.com. This is an Apache server owned by German and located in Peru. The front end of the server is built using bootstrap (www.getbootstrap.com) and jquery. The chartist library is used to display patient data. The backend of the web server is written in php, and the patient information is stored on a MySQL database. 
+
+****************************************************
+          3. Matlab cough detection Algorithm
+****************************************************
+
+The cough recordings are analyzed using a compiled matlab executable, found at http://healthglobalweb.com/tufts_cough/php/matlab. The runAllWavInDATADIR.exe command analyzes all files in the /DATADIR directory and outputs information in the /DATADIR_proc directory. The first line of the .txt output is a quality flag. 0 : good, 1 : max value was too low, 2 : abnormal variation. The next line in the output file is the length of the input. The third line is the number of cough epochs detected. 
 
